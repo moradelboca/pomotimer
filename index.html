@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>StudyBuddy</title>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css'>
+</head>
+<body>
+    <main>
+        <section id='userdata'>
+            <div class='userdata__stats'></div>
+            <div class='userdata__config'></div>
+        </section>
+        <section id='pomodoro'>
+            <h2 class="pomodoro__title">Time to study!</h2>
+            <h3 class="pomodoro__subtitle">Start Pomodoro</h3>
+            <p class="pomodoro__time">00:00:00</p>
+            <div class='pomodoro__controls'>
+                <button id='playpause'><i class='bi bi-play-fill'></i></button>
+            </div>
+        </section>
+        <section id='tasks'>
+            <h2>Tasks</h2>
+            <div id="taskscontainer"></div>
+        </section>
+    </main>
+    <script src='https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js'></script>
+    <script src='//cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <script src='./assets/js/main.js'></script>
+</body>
+</html>
+
