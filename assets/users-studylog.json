@@ -1,15 +1,15 @@
 [
-    {"id":1,"studytime":20,"date":"2000-04-23"},
-    {"id":2,"studytime":40,"date":"2000-04-23"},
-    {"id":1,"studytime":30,"date":"2000-04-25"},
-    {"id":1,"studytime":20,"date":"2000-04-25"},
-    {"id":2,"studytime":10,"date":"2000-04-27"},
-    {"id":3,"studytime":80,"date":"2000-04-29"},
-    {"id":4,"studytime":5,"date":"2000-04-30"},
-    {"id":1,"studytime":80,"date":"2000-05-01"},
-    {"id":1,"studytime":80,"date":"2000-05-03"},
-    {"id":2,"studytime":80,"date":"2000-05-03"},
-    {"id":1,"studytime":80,"date":"2000-05-03"},
-    {"id":2,"studytime":80,"date":"2000-05-07"},
-    {"id":4,"studytime":80,"date":"2000-05-20"}
+    {"id":1,"studytime":1020,"date":"2000-04-23"},
+    {"id":2,"studytime":1240,"date":"2000-04-23"},
+    {"id":1,"studytime":1530,"date":"2000-04-25"},
+    {"id":1,"studytime":6320,"date":"2000-04-25"},
+    {"id":2,"studytime":5410,"date":"2000-04-27"},
+    {"id":3,"studytime":280,"date":"2000-04-29"},
+    {"id":4,"studytime":8865,"date":"2000-04-30"},
+    {"id":1,"studytime":4480,"date":"2000-05-01"},
+    {"id":1,"studytime":580,"date":"2000-05-03"},
+    {"id":2,"studytime":380,"date":"2000-05-03"},
+    {"id":1,"studytime":6480,"date":"2000-05-03"},
+    {"id":2,"studytime":4880,"date":"2000-05-07"},
+    {"id":4,"studytime":3380,"date":"2000-05-20"}
 ]

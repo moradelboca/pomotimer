@@ -1,11 +1,14 @@
+
+/* Due to time issues, Tasks integration isn't finished :( */
+
 const DateTime = luxon.DateTime
 let USER = null
 let STUDYLOG = null
 let TASKS = null
 let TIMER = {
-    studyseconds: 5,
-    breakseconds: 3,
-    pomodoros: 2,
+    studyseconds: 30*60,
+    breakseconds: 5*60,
+    pomodoros: 5,
     actualTime: 0,
     actualPomo: 1,
     timerPaused: true,
@@ -108,7 +111,7 @@ function updateUserdataDOM(){
         const date = DateTime.fromISO(laststudy.date).toLocaleString({ month: 'long', day: 'numeric' })
         data += 
             `
-            <p>Last study session recorded was on ${date} with a total of ${laststudy.studytime} minutes studied!</p>
+            <p>Last study session recorded was on ${date} with a total of ${printTime(laststudy.studytime)} studied!</p>
             <p>Keep on going, you are doing great!</p>
             `
     }
@@ -239,6 +242,11 @@ function manageTime(){
         TIMER.actualTime = TIMER.studyseconds
         timerTitle.innerText = 'Studying!'
         timerSubtitle.innerText = 'Pomodoro ' + TIMER.actualPomo
+        STUDYLOG.push({
+            id: USER.id,
+            studytime: 0,
+            date: DateTime.now().toFormat('yyyy-MM-dd')
+        })
     }
     else{
         if (TIMER.actualTime == 0){
@@ -251,13 +259,6 @@ function manageTime(){
                     document.querySelector('.pomodoro__subtitle').innerText = 'Total time studied'
                     document.querySelector('.pomodoro__time').innerText = printTime(TIMER.studyseconds * TIMER.pomodoros)
                     document.getElementById('playpause').innerHTML = `<i class='bi bi-arrow-counterclockwise'></i>`
-                    USER.totalstudytime += TIMER.studyseconds
-                    STUDYLOG.push({
-                        id: USER.id,
-                        studytime: parseInt(TIMER.studyseconds*TIMER.pomodoros/60),
-                        date: DateTime.now().toFormat('yyyy-MM-dd')
-                    })
-                    saveAllUserData()
                     return
                 }
                 // Study hasn't finished...
@@ -280,6 +281,11 @@ function manageTime(){
         }
     }
     TIMER.actualTime--
+    if (TIMER.status == 'study'){
+        STUDYLOG[STUDYLOG.length - 1].studytime++
+        USER.totalstudytime++
+    }
+    saveAllUserData()
     timerTime.innerText = printTime(TIMER.actualTime)
 }
 
