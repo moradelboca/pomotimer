@@ -1,5 +1,8 @@
+/* 
+Due to time issues, the task menu isn't full finished :( 
+Still remaining ordering tasks, show doned tasks, 
 
-/* Due to time issues, Tasks integration isn't finished :( */
+*/
 
 const DateTime = luxon.DateTime
 let USER = null
@@ -104,7 +107,7 @@ function updateUserdataDOM(){
         `
         <h2>Welcome, ${USER.name}</h2/>
         <h3>Total Study Time</h3>
-        <p>${USER.studytime}</p>
+        <p>${printTime(USER.studytime)} hs</p>
         `
     if (STUDYLOG.length){
         const laststudy = STUDYLOG[STUDYLOG.length-1]
@@ -126,47 +129,49 @@ function updateUserdataDOM(){
  * @function login
  */
 async function login(){
-    const { value: userid } = await Swal.fire({
+    const { value: userid} = await Swal.fire({
         title: 'Log In',
         input: 'text',
         inputLabel: 'Enter your account ID to save your progress',
         showCancelButton: true,
         inputValidator: (value) => {
-        if (!value) {
-            return 'You need to write something!'
-        }
-        if (!/^[0-9]+$/.test(value)){
-            return 'You have entered a wrong character!'
-        }
+            if (!value) {
+                return 'You need to write something!'
+            }
+            if (!/^[0-9]+$/.test(value)){
+                return 'You have entered a wrong character!'
+            }
         },
     })
-    const done = await fetchUserData(userid)
-    if (done){
-        Swal.fire({
-            title: 'Logged in successfully!',
-            timer: 1500,
-            icon: 'success',
-            showDenyButton: false,
-            showConfirmButton: false,
-            showCancelButton: false,
-            timerProgressBar: false,
-          })
-        updateUserdataDOM()
-        const userdataDIV = document.getElementById('userdata')
-        const userdataControlsDIV = userdataDIV.lastElementChild
-        userdataControlsDIV.innerHTML = `<button type='button' id='logout'>Log Out</button>`
-        document.getElementById('logout').addEventListener('click', logout)
-    }
-    else{
-        Swal.fire({
-            title: 'User ID doesn\'t exists',
-            timer: 1500,
-            icon: 'error',
-            showDenyButton: false,
-            showConfirmButton: false,
-            showCancelButton: false,
-            timerProgressBar: false,
-        })
+    if (userid){
+        const done = await fetchUserData(userid)
+        if (done){
+            Swal.fire({
+                title: 'Logged in successfully!',
+                timer: 1500,
+                icon: 'success',
+                showDenyButton: false,
+                showConfirmButton: false,
+                showCancelButton: false,
+                timerProgressBar: false,
+            })
+            updateUserdataDOM()
+            const userdataDIV = document.getElementById('userdata')
+            const userdataControlsDIV = userdataDIV.lastElementChild
+            userdataControlsDIV.innerHTML = `<button type='button' id='logout'>Log Out</button>`
+            document.getElementById('logout').addEventListener('click', logout)
+        }
+        else{
+            Swal.fire({
+                title: 'User ID doesn\'t exists',
+                timer: 1500,
+                icon: 'error',
+                showDenyButton: false,
+                showConfirmButton: false,
+                showCancelButton: false,
+                timerProgressBar: false,
+            })
+        }
     }
 }
 
@@ -257,7 +262,7 @@ function manageTime(){
                     resetTimer()
                     document.querySelector('.pomodoro__title').innerText = 'Good Job!'
                     document.querySelector('.pomodoro__subtitle').innerText = 'Total time studied'
-                    document.querySelector('.pomodoro__time').innerText = printTime(TIMER.studyseconds * TIMER.pomodoros)
+                    document.querySelector('.pomodoro__time').innerText = printTime(TIMER.studyseconds * TIMER.pomodoros) + ' hs'
                     document.getElementById('playpause').innerHTML = `<i class='bi bi-arrow-counterclockwise'></i>`
                     return
                 }
@@ -339,9 +344,108 @@ function playpauseTimer(){
     }
 }
 
+/**
+ * Posts main user tasks to DOM.
+ * Also creates buttons to manage each task
+ * 
+ * @function updateTasksDOM
+ * @param {boolean} doneonly If true, shows done tasks only, otherwhise it'll show all tasks 
+ */
+function updateTasksDOM(doneonly=true){
+    let tasksDIV = document.getElementById('taskscontainer')
+    tasksDIV.innerHTML = ''
+    /**
+     * Create a task to post on DOM.
+     * 
+     * @param {number} index 
+     * @returns {element} Div that contains all data from task, a remove button and a mark as done button.
+     */
+    const createTask = (index) => {
+        const taskContainer = document.createElement('div')
+        taskContainer.setAttribute('id', `task${index}`)
+        const markAsDoneCheckbox = document.createElement('input')
+        markAsDoneCheckbox.setAttribute('type', 'checkbox')
+        markAsDoneCheckbox.setAttribute('id', `task${index}__markasdone`)
+        markAsDoneCheckbox.addEventListener('change', () => {
+            TASKS[index].done = !TASKS[index].done
+            updateTasksDOM()
+            saveAllUserData()
+        })
+        const taskTitle = document.createElement('h3')
+        taskTitle.innerText = TASKS[index].title
+        const removeButton = document.createElement('button')
+        removeButton.setAttribute('type', 'button')
+        removeButton.setAttribute('id', `task${index}__remove`)
+        removeButton.addEventListener('click', () => {
+            TASKS.splice(index, 1)
+            updateTasksDOM()
+            saveAllUserData()
+        })
+        removeButton.innerText = 'Remove'
+        taskContainer.append(markAsDoneCheckbox)
+        taskContainer.append(taskTitle)
+        taskContainer.append(removeButton)
+        return taskContainer
+    }
+    if (TASKS.length){
+        if (doneonly){
+            // Check if there's at least one task remaining
+            let not_alldone = TASKS.find(task => !task.done)
+            if (not_alldone){
+                for (let taskindex in TASKS){
+                    if (!TASKS[taskindex].done){
+                        tasksDIV.append(createTask(taskindex))
+                    }
+                }
+            }
+            else{
+                tasksDIV.innerHTML = '<p>Awesome! All tasks are done ;)</p>'
+            }
+        }
+        else{
+            // For each isn't used cause the algorithm uses and index!
+            for (let taskindex in TASKS){
+                tasksDIV.append(createTask(taskindex))
+            }
+        }
+    }
+    else{
+        tasksDIV.innerHTML = 'There aren\'t tasks created!'
+    }
+}
+
+/**
+ * Allows to add and save a task.
+ * 
+ * @async
+ * @function addTask
+ */
+async function addTask(){
+    const { value: title } = await Swal.fire({
+        title: 'Create a new task',
+        input: 'text',
+        inputLabel: 'Task Title',
+        showCancelButton: true,
+        inputValidator: (value) => {
+            if (!value) {
+                return 'You need to write something!'
+            }
+            if (value.length>20){
+                return 'You can\'t enter more than 20 characters'
+            }
+        },
+    })
+    if (title){
+        TASKS.push(new Task (title))
+        updateTasksDOM()
+        saveAllUserData()
+    }
+}
+
 window.addEventListener('load', () =>{
     loadUserData()
     updateUserdataDOM()
+    updateTasksDOM()
     // User ID 0 indicates anonymus user...
     const userdataDIV = document.getElementById('userdata')
     const userdataControlsDIV = userdataDIV.lastElementChild
@@ -354,4 +458,5 @@ window.addEventListener('load', () =>{
         document.getElementById('logout').addEventListener('click', logout)
     }
     document.getElementById('playpause').addEventListener('click', playpauseTimer)
+    document.getElementById('createtask').addEventListener('click', addTask)
 })
